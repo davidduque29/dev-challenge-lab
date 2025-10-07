@@ -45,6 +45,15 @@
     </dependencies>
 
     <build>
+        <!-- Exclusión de archivos .md en resources -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.md</exclude>
+                </excludes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

@@ -1,10 +1,7 @@
 package com.example.hospitalapi;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,4 +26,12 @@ public class HospitalController {
     public String home() {
         return "API activa. Usa /api/hospitals o /api/hospitals/{id}";
     }
+
+    @GetMapping("/hospitals/page")
+    public List<Hospital> getHospitalsByPage(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        return hospitalService.getHospitalsByPage(page, size);
+    }
+
 }

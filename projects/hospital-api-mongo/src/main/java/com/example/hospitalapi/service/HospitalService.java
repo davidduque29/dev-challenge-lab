@@ -1,7 +1,9 @@
 package com.example.hospitalapi.service;
-
+import com.example.hospitalapi.exception.MongoConnectionException;
 import com.example.hospitalapi.document.Hospital;
 import com.example.hospitalapi.repository.HospitalRepository;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.mongodb.UncategorizedMongoDbException;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -15,7 +17,13 @@ public class HospitalService {
     }
 
     public List<Hospital> getAll() {
-        return repository.findAll();
+        try {
+            return repository.findAll();
+        } catch (UncategorizedMongoDbException e) {
+            throw new MongoConnectionException("Error al conectar con MongoDB Atlas. Verifica las credenciales o la red.", e);
+        } catch (DataAccessException e) {
+            throw new MongoConnectionException("Error de acceso a datos en MongoDB.", e);
+        }
     }
 
     public Hospital save(Hospital hospital) {

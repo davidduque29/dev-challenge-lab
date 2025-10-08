@@ -40,8 +40,8 @@ No debe incluir la URI de Mongo ni el perfil activo.
 spring.data.mongodb.uri=mongodb://localhost:27017/hospitaldb
 spring.data.mongodb.database=hospitaldb
 
-3️⃣ application-cloud.properties → Perfil cloud (MongoDB Atlas)
-spring.data.mongodb.uri=mongodb+srv://mongouser:asus123@hospitalcluster.0dey0la.mongodb.net/hospitalapi?retryWrites=true&w=majority&appName=hospitalCluster
+3️⃣ application-cloud.properties → Perfil cloud (MongoDB Atlas) user=mongouser pass=password
+spring.data.mongodb.uri=mongodb+srv://{user}:{pass}@hospitalcluster.0dey0la.mongodb.net/hospitalapi?retryWrites=true&w=majority&appName=hospitalCluster
 spring.data.mongodb.database=hospitalapi
 
 🧠 Activación de Perfiles
@@ -177,12 +177,18 @@ Si corres con perfil cloud
 Con esta configuración:
 
 No es necesario editar archivos entre entornos.
-
 Puedes alternar perfiles desde IntelliJ o consola.
-
 Los logs indican claramente el entorno activo.
-
 MongoDB Compass o Atlas reflejarán los datos según el perfil seleccionado.
+
+
+> Renombrar el archivo a application.properties para que funcione en la nube y lo mismo en el caso de local
+
+> En caso de que no quiera renombrar sí puedes tener varios archivos con nombres distintos,
+> siempre que empiecen con application- y actives el perfil correcto.
+
+> en este caso de NUBE desde la opcion de RUN>EditConfigurations.. en la opcion ModifyOptions,
+> activa addVmOptions, una vez activa en VM Options, pon -Dspring-boot.run.profiles=CLOU
 
 ✍️ Autor: Iván David Duque
 📅 Versión: Octubre 2025

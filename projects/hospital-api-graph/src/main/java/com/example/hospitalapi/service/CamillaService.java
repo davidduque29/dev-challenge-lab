@@ -12,7 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Servicio para la gestión de camillas.
+ * 🏥 Servicio para la gestión de Camillas:
+ * - Consultar disponibilidad
+ * - Asignar paciente
+ * - Liberar camilla (alta del paciente)
  */
 @Service
 public class CamillaService {
@@ -26,124 +29,40 @@ public class CamillaService {
         this.camillaRepository = camillaRepository;
         this.pacienteRepository = pacienteRepository;
     }
-
     /**
-     * Obtener todas las camillas.
+     * Retorna todas las camillas sin importar su estado.
      */
     public List<Camilla> obtenerTodasLasCamillas() {
-        log.info("📋 Obteniendo todas las camillas registradas");
-        List<Camilla> lista = camillaRepository.findAll();
-        log.info("📤 Total camillas encontradas: {}", lista.size());
-        return lista;
+        log.info("📋 Obteniendo todas las camillas (sin filtro de estado)...");
+        List<Camilla> todas = camillaRepository.findAll();
+        log.info("📤 Total camillas encontradas: {}", todas.size());
+        return todas;
     }
 
     /**
-     * Obtiene todas las camillas con estado "Disponible". obtenerTodasLasCamillas
+     * Retorna todas las camillas disponibles (estado = "Disponible").
      */
     public List<Camilla> obtenerCamillasDisponibles() {
-        log.info("🛏️ Consultando camillas disponibles...");
-
-        try {
-            List<Camilla> disponibles = camillaRepository.findAll()
-                    .stream()
-                    .filter(c -> "Disponible".equalsIgnoreCase(c.getEstado()))
-                    .toList();
-
-            log.info("📤 Total camillas disponibles encontradas: {}", disponibles.size());
-            return disponibles;
-
-        } catch (Exception e) {
-            log.error("❌ Error al obtener camillas disponibles: {}", e.getMessage(), e);
-            throw new RuntimeException("Error al obtener camillas disponibles", e);
-        }
+        log.info("🛏️ Buscando camillas con estado 'Disponible'...");
+        List<Camilla> disponibles = camillaRepository.findByEstado("Disponible");
+        log.info("📤 Total camillas disponibles: {}", disponibles.size());
+        return disponibles;
     }
+
     /**
-     * Buscar una camilla por ID.
+     * Buscar una camilla específica por ID.
      */
-    public Optional<Camilla> obtenerCamillaPorId(String idCamilla) {
-        log.info("🔍 Buscando camilla con ID: {}", idCamilla);
-        Optional<Camilla> camilla = camillaRepository.findById(idCamilla);
-        if (camilla.isPresent()) {
-            log.info("✅ Camilla encontrada: {}", camilla.get().getHabitacion());
-        } else {
-            log.warn("⚠️ Camilla con ID {} no encontrada", idCamilla);
-        }
-        return camilla;
+    public Optional<Camilla> obtenerCamillaPorId(String id) {
+        log.info("🔍 Buscando camilla por ID: {}", id);
+        return camillaRepository.findById(id);
     }
 
-    /**
-     * Crear una nueva camilla.
-     */
-    public Camilla crearCamilla(Camilla camilla) {
-        log.info("🛏️ Iniciando creación de camilla: {}", camilla);
-
-        if (camilla == null) {
-            log.error("❌ No se puede crear una camilla nula");
-            throw new IllegalArgumentException("La camilla no puede ser nula");
-        }
-
-        try {
-            Camilla guardada = camillaRepository.save(camilla);
-            log.info("✅ Camilla creada correctamente con ID: {}", guardada.getId());
-            return guardada;
-        } catch (Exception e) {
-            log.error("❌ Error al guardar la camilla: {}", e.getMessage(), e);
-            throw new RuntimeException("Error al crear camilla", e);
-        }
-    }
+    // =============================
+    // 🧍‍♂️ ASIGNACIÓN DE PACIENTE
+    // =============================
 
     /**
-     * Actualiza una camilla existente por su ID.
-     */
-    public Camilla actualizarCamilla(String idCamilla, Camilla camillaActualizada) {
-        log.info("♻️ Iniciando actualización de camilla ID: {}", idCamilla);
-
-        if (camillaActualizada == null) {
-            log.warn("⚠️ La camilla enviada para actualizar es nula");
-            throw new IllegalArgumentException("La camilla no puede ser nula");
-        }
-
-        try {
-            return camillaRepository.findById(idCamilla)
-                    .map(camilla -> {
-                        if (camillaActualizada.getEstado() != null) {
-                            log.debug("🔄 Actualizando estado: {}", camillaActualizada.getEstado());
-                            camilla.setEstado(camillaActualizada.getEstado());
-                        }
-                        if (camillaActualizada.getHabitacion() != null) {
-                            log.debug("🔄 Actualizando habitación: {}", camillaActualizada.getHabitacion());
-                            camilla.setHabitacion(camillaActualizada.getHabitacion());
-                        }
-                        if (camillaActualizada.getPaciente() != null) {
-                            log.debug("🔄 Actualizando paciente asociado: {}", camillaActualizada.getPaciente().getNombres());
-                            camilla.setPaciente(camillaActualizada.getPaciente());
-                        }
-                        if (camillaActualizada.getFechaInicio() != null) {
-                            log.debug("🔄 Actualizando fechaInicio: {}", camillaActualizada.getFechaInicio());
-                            camilla.setFechaInicio(camillaActualizada.getFechaInicio());
-                        }
-                        if (camillaActualizada.getFechaFin() != null) {
-                            log.debug("🔄 Actualizando fechaFin: {}", camillaActualizada.getFechaFin());
-                            camilla.setFechaFin(camillaActualizada.getFechaFin());
-                        }
-
-                        Camilla guardada = camillaRepository.save(camilla);
-                        log.info("✅ Camilla actualizada exitosamente con ID: {}", guardada.getId());
-                        return guardada;
-                    })
-                    .orElseThrow(() -> {
-                        log.warn("⚠️ No se encontró camilla con ID {}", idCamilla);
-                        return new RuntimeException("Camilla no encontrada con id: " + idCamilla);
-                    });
-
-        } catch (Exception e) {
-            log.error("❌ Error al actualizar camilla con ID {}: {}", idCamilla, e.getMessage(), e);
-            throw new RuntimeException("Error al actualizar camilla", e);
-        }
-    }
-
-    /**
-     * Asignar un paciente a una camilla.
+     * Asigna un paciente a una camilla disponible.
      */
     public Camilla asignarPaciente(String idCamilla, String idPaciente) {
         log.info("🩺 Asignando paciente {} a camilla {}", idPaciente, idCamilla);
@@ -153,22 +72,30 @@ public class CamillaService {
             Optional<Paciente> pacienteOpt = pacienteRepository.findById(idPaciente);
 
             if (camillaOpt.isEmpty()) {
-                log.warn("⚠️ No se encontró camilla con ID: {}", idCamilla);
-                throw new RuntimeException("Camilla no encontrada con id: " + idCamilla);
+                log.warn("⚠️ Camilla no encontrada con ID: {}", idCamilla);
+                throw new RuntimeException("Camilla no encontrada con ID: " + idCamilla);
             }
             if (pacienteOpt.isEmpty()) {
-                log.warn("⚠️ No se encontró paciente con ID: {}", idPaciente);
-                throw new RuntimeException("Paciente no encontrado con id: " + idPaciente);
+                log.warn("⚠️ Paciente no encontrado con ID: {}", idPaciente);
+                throw new RuntimeException("Paciente no encontrado con ID: " + idPaciente);
             }
 
             Camilla camilla = camillaOpt.get();
             Paciente paciente = pacienteOpt.get();
 
+            if (!"Disponible".equalsIgnoreCase(camilla.getEstado())) {
+                log.warn("🚫 La camilla {} no está disponible, estado actual: {}", idCamilla, camilla.getEstado());
+                throw new RuntimeException("La camilla no está disponible para asignación");
+            }
+
+            // 🧩 Asociar entidades
             camilla.setPaciente(paciente);
             camilla.setEstado("Ocupada");
+            camilla.setFechaInicio(String.valueOf(java.time.LocalDate.now()));
 
             Camilla actualizada = camillaRepository.save(camilla);
-            log.info("✅ Paciente {} asignado correctamente a camilla {}", idPaciente, idCamilla);
+            log.info("✅ Paciente {} asignado correctamente a camilla {}", paciente.getPrimerNombre(), idCamilla);
+
             return actualizada;
 
         } catch (Exception e) {
@@ -177,41 +104,69 @@ public class CamillaService {
         }
     }
 
+    // =============================
+    // 🚪 LIBERAR CAMILLA
+    // =============================
+
     /**
-     * Liberar una camilla (marcar como disponible).
+     * Libera una camilla al dar de alta a un paciente.
      */
     public Camilla liberarCamilla(String idCamilla, String fechaFin) {
-        log.info("🚪 Liberando camilla {} con fecha {}", idCamilla, fechaFin);
+        log.info("🚪 Iniciando liberación de camilla ID: {}", idCamilla);
 
-        return camillaRepository.findById(idCamilla)
-                .map(c -> {
-                    c.setEstado("Disponible");
-                    c.setFechaFin(fechaFin);
-                    c.setPaciente(null);
-                    Camilla actualizada = camillaRepository.save(c);
-                    log.info("✅ Camilla liberada correctamente: {}", actualizada.getId());
-                    return actualizada;
-                })
-                .orElseThrow(() -> {
-                    log.warn("⚠️ No se encontró camilla con ID: {}", idCamilla);
-                    return new RuntimeException("Camilla no encontrada con id: " + idCamilla);
-                });
+        try {
+            return camillaRepository.findById(idCamilla)
+                    .map(camilla -> {
+                        if (camilla.getPaciente() != null) {
+                            Paciente paciente = camilla.getPaciente();
+                            paciente.setEstado("Alta");
+                            paciente.setFechaAlta(fechaFin);
+                            pacienteRepository.save(paciente);
+                            log.info("📋 Paciente {} dado de alta el {}", paciente.getPrimerNombre(), fechaFin);
+                        }
+
+                        camilla.setEstado("Disponible");
+                        camilla.setPaciente(null);
+                        camilla.setFechaFin(fechaFin);
+
+                        Camilla liberada = camillaRepository.save(camilla);
+                        log.info("✅ Camilla {} liberada correctamente", idCamilla);
+                        return liberada;
+                    })
+                    .orElseThrow(() -> {
+                        log.warn("⚠️ Camilla no encontrada con ID: {}", idCamilla);
+                        return new RuntimeException("Camilla no encontrada con id: " + idCamilla);
+                    });
+
+        } catch (Exception e) {
+            log.error("❌ Error al liberar camilla: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al liberar camilla", e);
+        }
     }
 
+    // =============================
+    // 🏗️ CREACIÓN Y ELIMINACIÓN
+    // =============================
 
     /**
-     * Eliminar una camilla.
+     * Crear una nueva camilla.
      */
-    public void eliminarCamilla(String id) {
-        log.info("🗑️ Eliminando camilla con ID: {}", id);
-
-        if (!camillaRepository.existsById(id)) {
-            log.warn("⚠️ No existe camilla con ID {} para eliminar", id);
-            throw new RuntimeException("Camilla no encontrada con id: " + id);
-        }
-
-        camillaRepository.deleteById(id);
-        log.info("✅ Camilla eliminada correctamente con ID: {}", id);
+    public Camilla crearCamilla(Camilla camilla) {
+        log.info("🛠️ Creando nueva camilla: {}", camilla.getHabitacion());
+        camilla.setEstado("Disponible");
+        return camillaRepository.save(camilla);
     }
 
+    /**
+     * Eliminar una camilla por su ID.
+     */
+    public void eliminarCamilla(String id) {
+        log.info("🗑️ Eliminando camilla ID: {}", id);
+        if (!camillaRepository.existsById(id)) {
+            log.warn("⚠️ Camilla no encontrada con ID: {}", id);
+            throw new RuntimeException("Camilla no encontrada con id: " + id);
+        }
+        camillaRepository.deleteById(id);
+        log.info("✅ Camilla eliminada exitosamente");
+    }
 }

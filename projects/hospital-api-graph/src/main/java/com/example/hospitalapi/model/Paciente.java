@@ -22,10 +22,21 @@ public class Paciente {
 
     @Id
     private String id;
-    private String nombres;
-    private String apellidos;
+    private String primerNombre;
+    private String segundoNombre;
+    private String primerApellido;
+    private String segundoApellido;
     private String documentoIdentidad;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date fechaNacimiento;
+    // Datos médicos básicos
+    private String tipoSangre;
+    private String genero;
+    private String alergias;
+    //Estado del paciente
+    private String estado; //Estados: "Hospitalizado", "Alta", "En observación"
     private String fechaAlta;
+    // Información administrativa
+    private String numeroHistoriaClinica; // Código único interno del hospital
+    private String eps;
 }

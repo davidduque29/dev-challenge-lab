@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Lógica de negocio para gestión de pacientes.
+ * 🏥 Servicio para la gestión de pacientes:
+ * - Creación, actualización, consulta y eliminación.
+ * - Maneja la lógica de negocio antes de persistir en MongoDB.
  */
 @Service
 public class PacienteService {
@@ -24,11 +26,15 @@ public class PacienteService {
         this.pacienteRepository = pacienteRepository;
     }
 
+    // =============================
+    // 🔍 MÉTODOS DE CONSULTA
+    // =============================
+
     /**
      * Obtener todos los pacientes registrados.
      */
     public List<Paciente> obtenerTodos() {
-        log.info("📋 Obteniendo lista completa de pacientes");
+        log.info("📋 Obteniendo lista completa de pacientes...");
         List<Paciente> lista = pacienteRepository.findAll();
         log.info("📤 Total pacientes encontrados: {}", lista.size());
         return lista;
@@ -40,27 +46,50 @@ public class PacienteService {
     public Optional<Paciente> obtenerPorId(String id) {
         log.info("🔍 Buscando paciente por ID: {}", id);
         Optional<Paciente> paciente = pacienteRepository.findById(id);
+
         if (paciente.isPresent()) {
-            log.info("✅ Paciente encontrado: {}", paciente.get().getNombres());
+            log.info("✅ Paciente encontrado: {} {}", paciente.get().getPrimerNombre(), paciente.get().getPrimerApellido());
         } else {
             log.warn("⚠️ Paciente con ID {} no encontrado", id);
         }
+
         return paciente;
     }
 
+    // =============================
+    // ➕ CREACIÓN
+    // =============================
+
     /**
-     * Crear un nuevo paciente con los campos del modelo.
+     * Crear un nuevo paciente con datos personales, médicos y administrativos.
      */
-    public Paciente crearPaciente(String nombres, String apellidos, String documentoIdentidad,
-                                  String fechaNacimiento, String fechaAlta) {
-        log.info("🩺 Iniciando creación de paciente: {} {}, Documento: {}", nombres, apellidos, documentoIdentidad);
+    public Paciente crearPaciente(
+            String primerNombre,
+            String segundoNombre,
+            String primerApellido,
+            String segundoApellido,
+            String documentoIdentidad,
+            String fechaNacimiento,
+            String tipoSangre,
+            String genero,
+            String alergias,
+            String estado,
+            String numeroHistoriaClinica,
+            String eps
+    ) {
+        log.info("🩺 Creando paciente: {} {} {}, Documento: {}", primerNombre, segundoNombre, primerApellido, documentoIdentidad);
+
         try {
             Paciente nuevo = new Paciente();
-            nuevo.setNombres(nombres);
-            nuevo.setApellidos(apellidos);
+
+            // 🧾 Datos personales
+            nuevo.setPrimerNombre(primerNombre);
+            nuevo.setSegundoNombre(segundoNombre);
+            nuevo.setPrimerApellido(primerApellido);
+            nuevo.setSegundoApellido(segundoApellido);
             nuevo.setDocumentoIdentidad(documentoIdentidad);
 
-            // Parseo de fecha de nacimiento (String → Date)
+            // 📅 Fecha de nacimiento
             if (fechaNacimiento != null && !fechaNacimiento.isEmpty()) {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 Date fecha = sdf.parse(fechaNacimiento);
@@ -68,10 +97,23 @@ public class PacienteService {
                 log.debug("📆 Fecha de nacimiento asignada: {}", fecha);
             }
 
-            nuevo.setFechaAlta(fechaAlta);
+            // 💉 Datos médicos
+            nuevo.setTipoSangre(tipoSangre);
+            nuevo.setGenero(genero);
+            nuevo.setAlergias(alergias);
 
+            // 🏥 Estado y alta
+            nuevo.setEstado(estado != null ? estado : "Hospitalizado");
+            nuevo.setFechaAlta(null); // Paciente recién ingresado
+
+            // 🧾 Información administrativa
+            nuevo.setNumeroHistoriaClinica(numeroHistoriaClinica);
+            nuevo.setEps(eps);
+
+            // 💾 Guardar en MongoDB
             Paciente guardado = pacienteRepository.save(nuevo);
             log.info("✅ Paciente creado exitosamente con ID: {}", guardado.getId());
+
             return guardado;
 
         } catch (Exception e) {
@@ -80,42 +122,66 @@ public class PacienteService {
         }
     }
 
+    // =============================
+    // ♻️ ACTUALIZACIÓN
+    // =============================
+
     /**
-     * Actualizar un paciente existente.
+     * Actualizar un paciente existente según los campos enviados.
      */
-    public Paciente actualizarPaciente(String id, String nombres, String apellidos,
-                                       String documentoIdentidad, String fechaNacimiento, String fechaAlta) {
+    public Paciente actualizarPaciente(
+            String id,
+            String primerNombre,
+            String segundoNombre,
+            String primerApellido,
+            String segundoApellido,
+            String documentoIdentidad,
+            String fechaNacimiento,
+            String tipoSangre,
+            String genero,
+            String alergias,
+            String estado,
+            String fechaAlta,
+            String numeroHistoriaClinica,
+            String eps
+    ) {
         log.info("♻️ Iniciando actualización de paciente ID: {}", id);
+
         try {
             return pacienteRepository.findById(id)
                     .map(p -> {
-                        if (nombres != null) {
-                            p.setNombres(nombres);
-                            log.debug("🔄 Actualizando nombres a: {}", nombres);
-                        }
-                        if (apellidos != null) {
-                            p.setApellidos(apellidos);
-                            log.debug("🔄 Actualizando apellidos a: {}", apellidos);
-                        }
-                        if (documentoIdentidad != null) {
-                            p.setDocumentoIdentidad(documentoIdentidad);
-                            log.debug("🔄 Actualizando documentoIdentidad a: {}", documentoIdentidad);
-                        }
+                        // 🔄 Datos personales
+                        if (primerNombre != null) p.setPrimerNombre(primerNombre);
+                        if (segundoNombre != null) p.setSegundoNombre(segundoNombre);
+                        if (primerApellido != null) p.setPrimerApellido(primerApellido);
+                        if (segundoApellido != null) p.setSegundoApellido(segundoApellido);
+                        if (documentoIdentidad != null) p.setDocumentoIdentidad(documentoIdentidad);
+
+                        // 📅 Fecha de nacimiento
                         if (fechaNacimiento != null && !fechaNacimiento.isEmpty()) {
                             try {
                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                                 Date fecha = sdf.parse(fechaNacimiento);
                                 p.setFechaNacimiento(fecha);
-                                log.debug("🔄 Actualizando fechaNacimiento a: {}", fecha);
                             } catch (Exception ex) {
                                 log.error("⚠️ Error parseando fechaNacimiento: {}", ex.getMessage());
                             }
                         }
-                        if (fechaAlta != null) {
-                            p.setFechaAlta(fechaAlta);
-                            log.debug("🔄 Actualizando fechaAlta a: {}", fechaAlta);
-                        }
 
+                        // 💉 Datos médicos
+                        if (tipoSangre != null) p.setTipoSangre(tipoSangre);
+                        if (genero != null) p.setGenero(genero);
+                        if (alergias != null) p.setAlergias(alergias);
+
+                        // 🏥 Estado y alta
+                        if (estado != null) p.setEstado(estado);
+                        if (fechaAlta != null) p.setFechaAlta(fechaAlta);
+
+                        // 🧾 Información administrativa
+                        if (numeroHistoriaClinica != null) p.setNumeroHistoriaClinica(numeroHistoriaClinica);
+                        if (eps != null) p.setEps(eps);
+
+                        // 💾 Guardar cambios
                         Paciente actualizado = pacienteRepository.save(p);
                         log.info("✅ Paciente actualizado exitosamente: {}", actualizado.getId());
                         return actualizado;
@@ -130,11 +196,16 @@ public class PacienteService {
         }
     }
 
+    // =============================
+    // 🗑️ ELIMINACIÓN
+    // =============================
+
     /**
      * Eliminar un paciente por su ID.
      */
     public void eliminarPaciente(String id) {
-        log.info("🗑️ Iniciando eliminación de paciente con ID: {}", id);
+        log.info("🗑️ Eliminando paciente con ID: {}", id);
+
         try {
             if (!pacienteRepository.existsById(id)) {
                 log.warn("⚠️ No se encontró paciente con ID {} para eliminar", id);

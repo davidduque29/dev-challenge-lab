@@ -1,152 +1,123 @@
 package com.example.hospitalapi.graphql.mutation;
 
 import com.example.hospitalapi.model.Camilla;
-import com.example.hospitalapi.model.Paciente;
 import com.example.hospitalapi.service.CamillaService;
-import com.example.hospitalapi.repository.PacienteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
 
-import java.util.Optional;
-
 /**
- * Resolver GraphQL para mutaciones de Camilla (crear, actualizar, asignar, liberar, eliminar).
+ * 🎯 Resolver GraphQL para Mutations relacionadas con Camillas.
+ * Gestiona la asignación, creación y liberación de camillas.
  */
 @Controller
 public class CamillaMutationResolver {
 
     private static final Logger log = LoggerFactory.getLogger(CamillaMutationResolver.class);
-
     private final CamillaService camillaService;
-    private final PacienteRepository pacienteRepository;
 
-    public CamillaMutationResolver(CamillaService camillaService, PacienteRepository pacienteRepository) {
+    public CamillaMutationResolver(CamillaService camillaService) {
         this.camillaService = camillaService;
-        this.pacienteRepository = pacienteRepository;
     }
 
+    // =============================
+    // CREAR CAMILLA
+    // =============================
+
     /**
-     * Crea una nueva camilla.
+     * Crea una nueva camilla en el sistema hospitalario.
+     * Ejemplo de uso (GraphQL):
+     * mutation {
+     *   crearCamilla(estado: "Disponible", habitacion: "201-B") {
+     *     id
+     *     estado
+     *     habitacion
+     *   }
+     * }
      */
     @MutationMapping
-    public Camilla crearCamilla(@Argument String estado,
-                                @Argument String habitacion,
-                                @Argument String pacienteId,
-                                @Argument String fechaInicio,
-                                @Argument String fechaFin) {
-        log.info("🛏️ Mutation crearCamilla(estado={}, habitacion={}, pacienteId={})",
-                estado, habitacion, pacienteId);
-
-        try {
-            Camilla nueva = new Camilla();
-            nueva.setEstado(estado);
-            nueva.setHabitacion(habitacion);
-            nueva.setFechaInicio(fechaInicio);
-            nueva.setFechaFin(fechaFin);
-
-            if (pacienteId != null) {
-                Optional<Paciente> paciente = pacienteRepository.findById(pacienteId);
-                paciente.ifPresent(nueva::setPaciente);
-            }
-
-            Camilla creada = camillaService.crearCamilla(nueva);
-            log.info("✅ Camilla creada con ID: {}", creada.getId());
-            return creada;
-
-        } catch (Exception e) {
-            log.error("❌ Error en crearCamilla: {}", e.getMessage(), e);
-            throw e;
-        }
+    public Camilla crearCamilla(
+            @Argument String estado,
+            @Argument String habitacion
+    ) {
+        log.info("🛠️ [GraphQL] Mutation → crearCamilla()");
+        Camilla nueva = new Camilla();
+        nueva.setEstado(estado != null ? estado : "Disponible");
+        nueva.setHabitacion(habitacion);
+        return camillaService.crearCamilla(nueva);
     }
 
+    // =============================
+    //  ASIGNAR PACIENTE
+    // =============================
+
     /**
-     * Actualiza una camilla existente.
+     * Asigna una camilla a un paciente hospitalizado.
+     * Ejemplo (GraphQL):
+     * mutation {
+     *   asignarPaciente(idCamilla: "68e84d03c693de24f9824a61", idPaciente: "68e847552d4447a1dc59fb76") {
+     *     id
+     *     estado
+     *     habitacion
+     *     paciente {
+     *       primerNombre
+     *       primerApellido
+     *       estado
+     *     }
+     *   }
+     * }
      */
     @MutationMapping
-    public Camilla actualizarCamilla(@Argument String id,
-                                     @Argument String estado,
-                                     @Argument String habitacion,
-                                     @Argument String pacienteId,
-                                     @Argument String fechaInicio,
-                                     @Argument String fechaFin) {
-        log.info("♻️ Mutation actualizarCamilla(id={}, estado={}, habitacion={}, pacienteId={})",
-                id, estado, habitacion, pacienteId);
-
-        try {
-            Camilla actualizada = new Camilla();
-            actualizada.setEstado(estado);
-            actualizada.setHabitacion(habitacion);
-            actualizada.setFechaInicio(fechaInicio);
-            actualizada.setFechaFin(fechaFin);
-
-            if (pacienteId != null) {
-                pacienteRepository.findById(pacienteId)
-                        .ifPresent(actualizada::setPaciente);
-            }
-
-            Camilla resultado = camillaService.actualizarCamilla(id, actualizada);
-            log.info("✅ Camilla actualizada correctamente: {}", resultado.getId());
-            return resultado;
-
-        } catch (Exception e) {
-            log.error("❌ Error en actualizarCamilla: {}", e.getMessage(), e);
-            throw e;
-        }
+    public Camilla asignarPaciente(
+            @Argument String idCamilla,
+            @Argument String idPaciente
+    ) {
+        log.info("🩺 [GraphQL] Mutation → asignarPaciente(camilla={}, paciente={})", idCamilla, idPaciente);
+        return camillaService.asignarPaciente(idCamilla, idPaciente);
     }
 
+    // =============================
+    // LIBERAR CAMILLA
+    // =============================
+
     /**
-     * Asigna un paciente a una camilla.
+     * Libera una camilla cuando un paciente es dado de alta.
+     * Ejemplo (GraphQL):
+     * mutation {
+     *   liberarCamilla(idCamilla: "68e84d03c693de24f9824a61", fechaFin: "2025-10-10") {
+     *     id
+     *     estado
+     *     habitacion
+     *     fechaFin
+     *   }
+     * }
      */
     @MutationMapping
-    public Camilla asignarPaciente(@Argument String idCamilla,
-                                   @Argument String idPaciente) {
-        log.info("🩺 Mutation asignarPaciente(idCamilla={}, idPaciente={})", idCamilla, idPaciente);
-
-        try {
-            Camilla camilla = camillaService.asignarPaciente(idCamilla, idPaciente);
-            log.info("✅ Paciente {} asignado a camilla {}", idPaciente, idCamilla);
-            return camilla;
-        } catch (Exception e) {
-            log.error("❌ Error en asignarPaciente: {}", e.getMessage(), e);
-            throw e;
-        }
+    public Camilla liberarCamilla(
+            @Argument String idCamilla,
+            @Argument String fechaFin
+    ) {
+        log.info("🚪 [GraphQL] Mutation → liberarCamilla(camilla={}, fechaFin={})", idCamilla, fechaFin);
+        return camillaService.liberarCamilla(idCamilla, fechaFin);
     }
 
-    /**
-     * Libera una camilla (cambia estado a 'Disponible' y elimina paciente).
-     */
-    @MutationMapping
-    public Camilla liberarCamilla(@Argument String idCamilla,
-                                  @Argument String fechaFin) {
-        log.info("🚪 Mutation liberarCamilla(idCamilla={}, fechaFin={})", idCamilla, fechaFin);
-
-        try {
-            Camilla camilla = camillaService.liberarCamilla(idCamilla, fechaFin);
-            log.info("✅ Camilla liberada correctamente con ID {}", idCamilla);
-            return camilla;
-        } catch (Exception e) {
-            log.error("❌ Error en liberarCamilla: {}", e.getMessage(), e);
-            throw e;
-        }
-    }
+    // =============================
+    // 🗑️ ELIMINAR CAMILLA
+    // =============================
 
     /**
-     * Elimina una camilla por ID.
+     * Elimina una camilla del sistema (solo si no está ocupada).
+     * Ejemplo (GraphQL):
+     * mutation {
+     *   eliminarCamilla(id: "68e84d03c693de24f9824a61")
+     * }
      */
     @MutationMapping
-    public Boolean eliminarCamilla(@Argument String id) {
-        log.info("🗑️ Mutation eliminarCamilla(id={})", id);
-
-        try {
-            camillaService.eliminarCamilla(id);
-            log.info("✅ Camilla eliminada correctamente con ID {}", id);
-            return true;
-        } catch (Exception e) {
-            log.error("❌ Error eliminando camilla con ID {}: {}", id, e.getMessage(), e);
-            return false;
-        }
+    public String eliminarCamilla(@Argument String id) {
+        log.info("🗑️ [GraphQL] Mutation → eliminarCamilla() ID: {}", id);
+        camillaService.eliminarCamilla(id);
+        return "✅ Camilla eliminada exitosamente con ID: " + id;
     }
 }

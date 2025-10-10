@@ -50,21 +50,38 @@ type Mutation {
     ): Boolean
 
     # 🔹 Operaciones para Paciente
+    #  Crear un nuevo paciente con todos los campos del modelo
     crearPaciente(
-        nombres: String!
-        apellidos: String
-        documentoIdentidad: String
+        primerNombre: String!
+        segundoNombre: String
+        primerApellido: String!
+        segundoApellido: String
+        documentoIdentidad: String!
         fechaNacimiento: String
-        fechaAlta: String
+        tipoSangre: String
+        genero: String
+        alergias: String
+        estado: String
+        numeroHistoriaClinica: String
+        eps: String
     ): Paciente
 
+    # Actualizar los datos de un paciente existente
     actualizarPaciente(
         id: ID!
-        nombres: String
-        apellidos: String
+        primerNombre: String
+        segundoNombre: String
+        primerApellido: String
+        segundoApellido: String
         documentoIdentidad: String
         fechaNacimiento: String
+        tipoSangre: String
+        genero: String
+        alergias: String
+        estado: String
         fechaAlta: String
+        numeroHistoriaClinica: String
+        eps: String
     ): Paciente
 
     eliminarPaciente(

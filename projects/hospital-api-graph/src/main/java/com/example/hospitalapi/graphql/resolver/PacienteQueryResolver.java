@@ -44,7 +44,8 @@ public class PacienteQueryResolver {
         log.info("📥 Consulta GraphQL: pacientePorId(id={})", id);
         Optional<Paciente> paciente = pacienteService.obtenerPorId(id);
         if (paciente.isPresent()) {
-            log.info("📤 Paciente encontrado: {}", paciente.get().getNombres());
+            log.info("📤 Paciente encontrado: {}", paciente.get().getPrimerNombre()
+                    +" "+paciente.get().getPrimerApellido()+" (ID: "+paciente.get().getId()+")");
             return paciente.get();
         } else {
             log.warn("⚠️ No se encontró paciente con ID {}", id);

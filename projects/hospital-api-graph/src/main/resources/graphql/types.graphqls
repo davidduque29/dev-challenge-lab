@@ -1,0 +1,24 @@
+# ===== Tipos compartidos =====
+"""
+Representa una camilla hospitalaria y su estado actual.
+"""
+type Camilla {
+    id: ID!
+    estado: String!
+    habitacion: String!
+    paciente: Paciente
+    fechaInicio: String
+    fechaFin: String
+}
+
+"""
+Representa un paciente hospitalizado o dado de alta.
+"""
+type Paciente {
+    id: ID!
+    nombres: String!
+    apellidos: String!
+    documentoIdentidad: String!
+    fechaNacimiento: String
+    fechaAlta: String
+}

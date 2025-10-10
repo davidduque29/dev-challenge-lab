@@ -1,0 +1,15 @@
+
+# ===== Operaciones del mock =====
+extend type Query {
+    # Retorna las camillas simuladas en memoria
+    camillasDisponiblesMock: [Camilla]
+
+    # Busca una camilla simulada por su ID
+    camillaPorIdMock(id: ID!): Camilla
+}
+
+extend type Mutation {
+    # Libera una camilla del mock
+    liberarCamillaMock(idCamilla: ID!, fechaFin: String!): Camilla
+}
+

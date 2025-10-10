@@ -1,0 +1,74 @@
+# ==============================
+# QUERIES
+# ==============================
+type Query {
+    #  Consultas de Camilla
+    camillasDisponibles: [Camilla]
+    camillaPorId(id: ID!): Camilla
+    todasLasCamillas: [Camilla]
+
+    # Consultas de Paciente
+    obtenerPacientes: [Paciente]
+    pacientePorId(id: ID!): Paciente
+}
+
+
+# ==============================
+# MUTATIONS
+# ==============================
+type Mutation {
+    # 🔹 Operaciones para Camilla
+    crearCamilla(
+        estado: String!
+        habitacion: String!
+        pacienteId: ID
+        fechaInicio: String
+        fechaFin: String
+    ): Camilla
+
+    actualizarCamilla(
+        id: ID!
+        estado: String
+        habitacion: String
+        pacienteId: ID
+        fechaInicio: String
+        fechaFin: String
+    ): Camilla
+
+    asignarPaciente(
+        idCamilla: ID!
+        idPaciente: ID!
+    ): Camilla
+
+    liberarCamilla(
+        idCamilla: ID!
+        fechaFin: String!
+    ): Camilla
+
+    eliminarCamilla(
+        id: ID!
+    ): Boolean
+
+    # 🔹 Operaciones para Paciente
+    crearPaciente(
+        nombres: String!
+        apellidos: String
+        documentoIdentidad: String
+        fechaNacimiento: String
+        fechaAlta: String
+    ): Paciente
+
+    actualizarPaciente(
+        id: ID!
+        nombres: String
+        apellidos: String
+        documentoIdentidad: String
+        fechaNacimiento: String
+        fechaAlta: String
+    ): Paciente
+
+    eliminarPaciente(
+        id: ID!
+    ): Boolean
+}
+

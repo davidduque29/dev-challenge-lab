@@ -43,10 +43,10 @@ public class CamillaMutationResolver {
             @Argument String habitacion
     ) {
         log.info("🛠️ [GraphQL] Mutation → crearCamilla()");
-        Camilla nueva = new Camilla();
-        nueva.setEstado(estado != null ? estado : "Disponible");
-        nueva.setHabitacion(habitacion);
-        return camillaService.crearCamilla(nueva);
+        Camilla camillaNueva = new Camilla();
+        camillaNueva.setEstado(estado != null ? estado : "Disponible");
+        camillaNueva.setHabitacion(habitacion);
+        return camillaService.crearCamilla(camillaNueva);
     }
 
     // =============================

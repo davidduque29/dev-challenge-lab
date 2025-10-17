@@ -1,0 +1,96 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>hospital-api-modules</artifactId>
+    <version>1.4.0</version>
+    <packaging>jar</packaging>
+
+    <name>hospital-api-events</name>
+    <description>Spring Boot REST API for managing hospitals, patients, and resources,
+        built for learning and real-world healthcare scenarios v4.</description>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.6</version>
+        <relativePath/>
+    </parent>
+
+    <properties>
+        <java.version>22</java.version>
+    </properties>
+
+    <dependencies>
+        <!-- Starter web para REST -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- Starter test (opcional) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- (opcional) para JSON más legible -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <!-- Starter oficial de Spring GraphQL -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-graphql</artifactId>
+        </dependency>
+        <!-- (Opcional) Dependencia para tests con GraphQL -->
+        <dependency>
+            <groupId>org.springframework.graphql</groupId>
+            <artifactId>spring-graphql-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Lombok para generar getters, setters, constructores, etc -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <!-- Exclusión de archivos .md en resources -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.md</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

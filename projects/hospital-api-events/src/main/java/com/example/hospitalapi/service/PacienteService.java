@@ -1,9 +1,9 @@
 package com.example.hospitalapi.service;
 
+import com.example.hospitalapi.document.CamillaDocument;
+import com.example.hospitalapi.document.PacienteDocument;
 import com.example.hospitalapi.events.consumer.EventPublisher;
 import com.example.hospitalapi.events.model.CamillaLiberadaEvent;
-import com.example.hospitalapi.model.Camilla;
-import com.example.hospitalapi.model.Paciente;
 import com.example.hospitalapi.repository.CamillaRepository;
 import com.example.hospitalapi.repository.PacienteRepository;
 import org.slf4j.Logger;
@@ -40,9 +40,9 @@ public class PacienteService {
     /**
      * Da de alta un paciente y libera automáticamente la camilla asociada.
      */
-    public Paciente darAlta(String idPaciente) {
+    public PacienteDocument darAlta(String idPaciente) {
         // 1️⃣ Buscar el paciente en la base
-        Paciente paciente = pacienteRepository.findById(idPaciente)
+        PacienteDocument paciente = pacienteRepository.findById(idPaciente)
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado con ID: " + idPaciente));
 
         // 2️⃣ Cambiar el estado y registrar fecha de alta
@@ -52,7 +52,7 @@ public class PacienteService {
         log.info("✅ Paciente {} dado de alta correctamente.", paciente.getPrimerNombre());
 
         // 3️⃣ Buscar la camilla asociada a este paciente (DBRef)
-        Camilla camilla = camillaRepository.findByPaciente_Id(paciente.getId())
+        CamillaDocument camilla = camillaRepository.findByPaciente_Id(paciente.getId())
                 .orElse(null);
 
         if (camilla != null) {
@@ -76,15 +76,15 @@ public class PacienteService {
         return paciente;
     }
         // =============================
-    // 🔍 MÉTODOS DE CONSULTA
+    // 🔍 MÉTODOS DE CONSULTA Hospitalizado
     // =============================
 
     /**
      * Obtener todos los pacientes registrados.
      */
-    public List<Paciente> obtenerTodos() {
+    public List<PacienteDocument> obtenerTodos() {
         log.info("📋 Obteniendo lista completa de pacientes...");
-        List<Paciente> lista = pacienteRepository.findAll();
+        List<PacienteDocument> lista = pacienteRepository.findAll();
         log.info("📤 Total pacientes encontrados: {}", lista.size());
         return lista;
     }
@@ -92,9 +92,9 @@ public class PacienteService {
     /**
      * Buscar un paciente por su ID.
      */
-    public Optional<Paciente> obtenerPorId(String id) {
+    public Optional<PacienteDocument> obtenerPorId(String id) {
         log.info("🔍 Buscando paciente por ID: {}", id);
-        Optional<Paciente> paciente = pacienteRepository.findById(id);
+        Optional<PacienteDocument> paciente = pacienteRepository.findById(id);
 
         if (paciente.isPresent()) {
             log.info("✅ Paciente encontrado: {} {}", paciente.get().getPrimerNombre(), paciente.get().getPrimerApellido());
@@ -112,7 +112,7 @@ public class PacienteService {
     /**
      * Crear un nuevo paciente con datos personales, médicos y administrativos.
      */
-    public Paciente crearPaciente(
+    public PacienteDocument crearPaciente(
             String primerNombre,
             String segundoNombre,
             String primerApellido,
@@ -129,7 +129,7 @@ public class PacienteService {
         log.info("🩺 Creando paciente: {} {} {}, Documento: {}", primerNombre, segundoNombre, primerApellido, documentoIdentidad);
 
         try {
-            Paciente nuevo = new Paciente();
+            PacienteDocument nuevo = new PacienteDocument();
 
             // 🧾 Datos personales
             nuevo.setPrimerNombre(primerNombre);
@@ -160,7 +160,7 @@ public class PacienteService {
             nuevo.setEps(eps);
 
             // 💾 Guardar en MongoDB
-            Paciente guardado = pacienteRepository.save(nuevo);
+            PacienteDocument guardado = pacienteRepository.save(nuevo);
             log.info("✅ Paciente creado exitosamente con ID: {}", guardado.getId());
 
             return guardado;
@@ -178,7 +178,7 @@ public class PacienteService {
     /**
      * Actualizar un paciente existente según los campos enviados.
      */
-    public Paciente actualizarPaciente(
+    public PacienteDocument actualizarPaciente(
             String id,
             String primerNombre,
             String segundoNombre,
@@ -231,7 +231,7 @@ public class PacienteService {
                         if (eps != null) p.setEps(eps);
 
                         // 💾 Guardar cambios
-                        Paciente actualizado = pacienteRepository.save(p);
+                        PacienteDocument actualizado = pacienteRepository.save(p);
                         log.info("✅ Paciente actualizado exitosamente: {}", actualizado.getId());
                         return actualizado;
                     })

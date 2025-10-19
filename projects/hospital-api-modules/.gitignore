@@ -35,10 +35,6 @@ build/
 ### VS Code ###
 .vscode/
 
-# Evita subir Markdown de documentación dentro de src
-src/**/*.md
-target/
-
 ### Mac OS ###
 .DS_Store
 

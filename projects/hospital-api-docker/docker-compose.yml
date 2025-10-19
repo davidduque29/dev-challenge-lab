@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"      # Puerto de conexión AMQP
+      - "15672:15672"    # Panel de administración
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - hospital-net
+
+  hospital-api:
+    image: hospital-api
+    container_name: hospital-api
+    build:
+      context: ./applications/app-service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rabbitmq
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      MONGODB_URI: mongodb+srv://mongouser:asus123@hospitalcluster.0dey0la.mongodb.net/hospitalapi?retryWrites=true&w=majority&appName=hospitalCluster
+    networks:
+      - hospital-net
+
+networks:
+  hospital-net:
+    driver: bridge

@@ -10,7 +10,6 @@ target/
 *.iws
 *.ipr
 
-
 # === Environment ===
 .env
 

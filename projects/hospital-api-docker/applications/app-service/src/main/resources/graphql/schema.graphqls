@@ -1,0 +1,91 @@
+# ==============================
+# QUERIES
+# ==============================
+type Query {
+    #  Consultas de CamillaDocument
+    camillasDisponibles: [CamillaDocument]
+    camillaPorId(id: ID!): CamillaDocument
+    todasLasCamillas: [CamillaDocument]
+
+    # Consultas de Paciente
+    obtenerPacientes: [PacienteDocument]
+    pacientePorId(id: ID!): PacienteDocument
+}
+
+
+# ==============================
+# MUTATIONS
+# ==============================
+type Mutation {
+    # 🔹 Operaciones para CamillaDocument
+    crearCamilla(
+        estado: String!
+        habitacion: String!
+        pacienteId: ID
+        fechaInicio: String
+        fechaFin: String
+    ): CamillaDocument
+
+    actualizarCamilla(
+        id: ID!
+        estado: String
+        habitacion: String
+        pacienteId: ID
+        fechaInicio: String
+        fechaFin: String
+    ): CamillaDocument
+
+    asignarPaciente(
+        idCamilla: ID!
+        idPaciente: ID!
+    ): CamillaDocument
+
+    liberarCamilla(
+        idCamilla: ID!
+        fechaFin: String!
+    ): CamillaDocument
+
+    eliminarCamilla(
+        id: ID!
+    ): Boolean
+
+    # 🔹 Operaciones para Paciente
+    #  Crear un nuevo paciente con todos los campos del modelo
+    crearPaciente(
+        primerNombre: String!
+        segundoNombre: String
+        primerApellido: String!
+        segundoApellido: String
+        documentoIdentidad: String!
+        fechaNacimiento: String
+        tipoSangre: String
+        genero: String
+        alergias: String
+        estado: String
+        numeroHistoriaClinica: String
+        eps: String
+    ): PacienteDocument
+
+    # Actualizar los datos de un paciente existente
+    actualizarPaciente(
+        id: ID!
+        primerNombre: String
+        segundoNombre: String
+        primerApellido: String
+        segundoApellido: String
+        documentoIdentidad: String
+        fechaNacimiento: String
+        tipoSangre: String
+        genero: String
+        alergias: String
+        estado: String
+        fechaAlta: String
+        numeroHistoriaClinica: String
+        eps: String
+    ): PacienteDocument
+
+    eliminarPaciente(
+        id: ID!
+    ): Boolean
+}
+

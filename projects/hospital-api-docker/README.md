@@ -96,6 +96,7 @@ El propósito principal de esta API es **digitalizar el flujo de atención hospi
 | 🔍 v1.2  | `hospital-api-graph`         | Spring Boot GraphQL · Altair · Postman · REST/GraphQL Controllers | Implementación de GraphQL con queries, mutations y manejo de excepciones. |
 | 📡 v1.3  | `hospital-api-events`        | RabbitMQ · Spring AMQP · Event-driven Architecture | Comunicación asíncrona mediante eventos (publicación y consumo de colas). |
 | ⚙️ v1.4  | `hospital-api-modules`       | Multi-módulo Maven · Project Generator Clean v2 | Organización modular del ecosistema: pacientes, camillas, tareas, hospital. |
+| 🐳 v1.5  | `hospital-api-docker`        | Docker · Docker Compose · Render · GHCR.io | Contenerización completa del ecosistema con Mongo y RabbitMQ para despliegue. |
 
 ---
 

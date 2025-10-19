@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
 
     <name>SpringBootRestHospitals</name>
-    <description>Simple REST API example for Hospitals</description>
+    <description>Simple REST API example for Hospitals v1.0</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

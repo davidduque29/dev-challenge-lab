@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="846b30f4-043b-4f38-9ae7-8294438e3e34" name="Changes" comment="SE AJUSTA VERSIONAMIENTO V1.0">
+      <change afterPath="$PROJECT_DIR$/../hospital-api-mongo/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/aws.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;davidduque29&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:davidduque29/dev-challenge-lab.git&quot;,
+    &quot;accountId&quot;: &quot;ff294c02-1982-4413-bec2-6b88c93c6630&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="33kKsy5v8Es6QoMjzWuuUbcYUsE" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showScratchesAndConsoles" value="false" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.run.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.springboot-rest-hospitals [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.springboot-rest-hospitals [compile].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/PROYECTOS DESARROLLO/PERSONAL/dev-challenge-lab/projects/hospital-api-mongo&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\PROYECTOS DESARROLLO\PERSONAL\dev-challenge-lab\projects\hospital-api\documentation" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="run" type="Application" factoryName="Application">
+      <option name="ALTERNATIVE_JRE_PATH" value="21" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="com.example.hospitalapi.SpringBoot2Application" />
+      <module name="springboot-rest-hospitals" />
+      <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
+        <option name="credential" />
+        <option name="region" />
+        <option name="useCurrentConnection" value="false" />
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="846b30f4-043b-4f38-9ae7-8294438e3e34" name="Changes" comment="" />
+      <created>1759855840791</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1759855840791</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Implementa paginación en HospitalService y agrega documentación técnica&#10;&#10;- Se amplió la lista de hospitales a 15 registros simulando una base de datos.&#10;- Se añadió método getHospitalsByPage(int page, int size) con validación de rangos.&#10;- Se actualizó HospitalController con endpoint /api/hospitals/page?page=&amp;size=&#10;- Se agregó documentación Markdown explicando la fórmula (page - 1) * size.&#10;- Se añadió diagrama funcional y resumen general en HospitalAPI_Paginacion.md.">
+      <option name="closed" value="true" />
+      <created>1759873002820</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1759873002820</updated>
+    </task>
+    <task id="LOCAL-00002" summary="SE AJUSTA VERSIONAMIENTO V1.0">
+      <option name="closed" value="true" />
+      <created>1760850554620</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1760850554620</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Implementa paginación en HospitalService y agrega documentación técnica&#10;&#10;- Se amplió la lista de hospitales a 15 registros simulando una base de datos.&#10;- Se añadió método getHospitalsByPage(int page, int size) con validación de rangos.&#10;- Se actualizó HospitalController con endpoint /api/hospitals/page?page=&amp;size=&#10;- Se agregó documentación Markdown explicando la fórmula (page - 1) * size.&#10;- Se añadió diagrama funcional y resumen general en HospitalAPI_Paginacion.md." />
+    <MESSAGE value="SE AJUSTA VERSIONAMIENTO V1.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="SE AJUSTA VERSIONAMIENTO V1.0" />
+  </component>
+</project>

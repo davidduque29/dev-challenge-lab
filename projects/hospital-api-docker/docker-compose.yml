@@ -5,38 +5,41 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5672:5672"      # Puerto de conexión AMQP
+      - "15672:15672"    # Panel de administración RabbitMQ
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     networks:
       - hospital-net
 
   hospital-api:
-    image: hospital-api
     container_name: hospital-api
     build:
-      context: ./applications/app
+      context: .               # 📍 Usa la carpeta raíz como contexto
+      dockerfile: Dockerfile   # 📍 Usa el Dockerfile que moviste al root
+    image: hospital-api:latest # Etiqueta de la imagen generada
+    ports:
+      - "8080:8080"            # Exponer puerto HTTP
     depends_on:
-      rabbitmq:
-        condition: service_healthy   # 👈 espera a que RabbitMQ esté listo
+      - rabbitmq
     environment:
+      # 🧩 Configuración de RabbitMQ
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
-      MONGODB_URI: ${MONGODB_URI}
-    ports:
-      - "8080:8080"
+
+      # 🧠 Conexión Mongo Atlas
+      SPRING_DATA_MONGODB_URI: mongodb+srv://mongouser:asus123@hospitalcluster.0dey0la.mongodb.net/hospitalapi?retryWrites=true&w=majority&appName=hospitalCluster
+
+      # (Opcional) Perfil activo en Spring Boot
+      SPRING_PROFILES_ACTIVE: prod
     networks:
       - hospital-net
+    restart: unless-stopped   # 🔁 Reinicia si el contenedor se detiene inesperadamente
 
 networks:
   hospital-net:
+    driver: bridge
 

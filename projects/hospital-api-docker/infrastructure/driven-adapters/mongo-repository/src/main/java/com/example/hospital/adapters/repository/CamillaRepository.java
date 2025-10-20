@@ -1,7 +1,7 @@
 package com.example.hospital.adapters.repository;
 
 
-import com.example.hospital.document.CamillaDocument;
+import com.example.hospital.adapters.document.CamillaDocument;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.util.Optional;

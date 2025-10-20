@@ -1,9 +1,10 @@
 package graphql.resolver;
 
-import com.example.hospital.document.CamillaDocument;
+
+import com.example.hospital.model.Camilla;
 import com.example.hospital.usecase.camilla.CamillaUseCase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
@@ -14,38 +15,34 @@ import java.util.Optional;
 /**
  * Resolver GraphQL para consultas de camillas (lecturas).
  */
+@Slf4j
 @Controller
+@RequiredArgsConstructor
 public class CamillaQueryResolver {
 
-    private static final Logger log = LoggerFactory.getLogger(CamillaQueryResolver.class);
-    private final CamillaUseCase camillaService;
-
-    public CamillaQueryResolver(CamillaUseCase camillaService) {
-        this.camillaService = camillaService;
-    }
+    private final CamillaUseCase camillaUseCase;
 
     /**
      * Retorna todas las camillas con estado "Disponible".
      */
     @QueryMapping
-    public List<CamillaDocument> camillasDisponibles() {
+    public List<Camilla> camillasDisponibles() {
         log.info("📥 Query GraphQL: camillasDisponibles()");
-        List<CamillaDocument> disponibles = camillaService.obtenerCamillasDisponibles();
+        List<Camilla> disponibles = camillaUseCase.obtenerCamillasDisponibles();
         log.info("📤 Total camillas disponibles encontradas: {}", disponibles.size());
         return disponibles;
     }
 
     /**
      * Retorna una camilla específica por su ID.
-     * El nombre del argumento debe coincidir con el schema (id: ID!)
      */
     @QueryMapping
-    public CamillaDocument camillaPorId(@Argument("id") String id) {
+    public Camilla camillaPorId(@Argument String id) {
         log.info("📥 Query GraphQL: camillaPorId(id={})", id);
-        Optional<CamillaDocument> camilla = camillaService.obtenerCamillaPorId(id);
+        Optional<Camilla> camilla = camillaUseCase.obtenerCamillaPorId(id);
 
         if (camilla.isPresent()) {
-            log.info("✅ CamillaDocument encontrada: {}", camilla.get().getHabitacion());
+            log.info("✅ Camilla encontrada: {}", camilla.get().getHabitacion());
             return camilla.get();
         } else {
             log.warn("⚠️ No se encontró camilla con ID {}", id);
@@ -57,9 +54,9 @@ public class CamillaQueryResolver {
      * Retorna todas las camillas sin importar su estado.
      */
     @QueryMapping
-    public List<CamillaDocument> todasLasCamillas() {
+    public List<Camilla> todasLasCamillas() {
         log.info("📥 Query GraphQL: todasLasCamillas()");
-        List<CamillaDocument> todas = camillaService.obtenerTodasLasCamillas();
+        List<Camilla> todas = camillaUseCase.obtenerTodasLasCamillas();
         log.info("📤 Total camillas encontradas: {}", todas.size());
         return todas;
     }

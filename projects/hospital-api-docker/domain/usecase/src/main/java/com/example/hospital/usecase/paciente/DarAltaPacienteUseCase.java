@@ -1,12 +1,15 @@
 package com.example.hospital.usecase.paciente;
 
-import com.example.hospital.document.PacienteDocument;
+
 import com.example.hospital.exception.BusinessException;
 import com.example.hospital.exception.MongoConnectionException;
+import com.example.hospital.model.Camilla;
 import com.example.hospital.model.CamillaLiberadaEvent;
+import com.example.hospital.model.Paciente;
 import com.example.hospital.ports.input.EventPublisherPort;
 import com.example.hospital.ports.out.CamillaRepositoryPort;
 import com.example.hospital.ports.out.PacienteRepositoryPort;
+import com.example.hospital.usecase.paciente.result.AltaPacienteResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,25 +34,25 @@ public class DarAltaPacienteUseCase {
     private final EventPublisherPort eventPublisher;
 
     /**
-     * Método principal del caso de uso.
-     * Ejecuta completo el flujo de alta de un paciente.
+     * Ejecuta el flujo completo de alta y retorna tanto el paciente como la camilla liberada.
      */
-    public PacienteDocument darAlta(String idPaciente) {
+    public AltaPacienteResult darAlta(String idPaciente) {
         log.info("🚪 Iniciando proceso de alta para paciente ID: {}", idPaciente);
 
-        PacienteDocument paciente = obtenerPaciente(idPaciente);
+        Paciente paciente = obtenerPaciente(idPaciente);
         validarEstadoPaciente(paciente);
         actualizarEstadoAlta(paciente);
-        liberarCamillaYPublicarEvento(paciente);
+
+        Camilla camillaLiberada = liberarCamillaYPublicarEvento(paciente);
 
         log.info("🏁 Proceso de alta completado para paciente {}", paciente.getId());
-        return paciente;
+        return new AltaPacienteResult(paciente, camillaLiberada);
     }
 
     /**
      * Obtiene el paciente desde el repositorio y valida su existencia.
      */
-    private PacienteDocument obtenerPaciente(String idPaciente) {
+    private Paciente obtenerPaciente(String idPaciente) {
         try {
             return pacienteRepository.findById(idPaciente)
                     .orElseThrow(() -> new BusinessException(
@@ -59,14 +62,16 @@ public class DarAltaPacienteUseCase {
                     ));
         } catch (Exception e) {
             log.error("❌ Error al consultar paciente con ID {}: {}", idPaciente, e.getMessage(), e);
-            throw new MongoConnectionException("Error al conectar con la base de datos para buscar paciente " + idPaciente, e);
+            throw new MongoConnectionException(
+                    "Error al conectar con la base de datos para buscar paciente " + idPaciente, e
+            );
         }
     }
 
     /**
      * Valida que el paciente esté en un estado que permita el alta.
      */
-    private void validarEstadoPaciente(PacienteDocument paciente) {
+    private void validarEstadoPaciente(Paciente paciente) {
         if ("Alta".equalsIgnoreCase(paciente.getEstado())) {
             throw new BusinessException(
                     "CONFLICT",
@@ -84,14 +89,10 @@ public class DarAltaPacienteUseCase {
         }
     }
 
-
     /**
      * Actualiza el estado del paciente a "Alta" y registra la fecha de alta.
      */
-    /**
-     * Actualiza el estado del paciente a "Alta" y registra la fecha de alta.
-     */
-    private void actualizarEstadoAlta(PacienteDocument paciente) {
+    private void actualizarEstadoAlta(Paciente paciente) {
         LocalDateTime ahora = LocalDateTime.now();
         paciente.setEstado("Alta");
         paciente.setFechaAlta(ahora.toString());
@@ -105,46 +106,50 @@ public class DarAltaPacienteUseCase {
         }
     }
 
-
     /**
      * Libera la camilla asociada y publica el evento de liberación en RabbitMQ.
      */
-    private void liberarCamillaYPublicarEvento(PacienteDocument paciente) {
-        camillaRepository.findByPacienteId(paciente.getId()).ifPresentOrElse(camilla -> {
-            if (!"Ocupada".equalsIgnoreCase(camilla.getEstado())) {
-                log.warn("⚠️ Camilla {} no está ocupada, no se enviará evento de liberación.", camilla.getId());
-                return;
-            }
+    private Camilla liberarCamillaYPublicarEvento(Paciente paciente) {
+        return camillaRepository.findByPacienteId(paciente.getId())
+                .map(camilla -> {
+                    if (!"Ocupada".equalsIgnoreCase(camilla.getEstado())) {
+                        log.warn("⚠️ Camilla {} no está ocupada, no se liberará.", camilla.getId());
+                        return null;
+                    }
 
-            // Actualiza el estado de la camilla
-            camilla.setEstado("Disponible");
-            try {
-                camillaRepository.save(camilla);
-                log.info("Camilla {} liberada exitosamente.", camilla.getId());
-            } catch (Exception e) {
-                log.error("❌ Error al guardar estado de la camilla {}: {}", camilla.getId(), e.getMessage(), e);
-                throw new MongoConnectionException("Error al liberar camilla " + camilla.getId(), e);
-            }
+                    camilla.setEstado("Disponible");
+                    camilla.setPaciente(null);
+                    camilla.setFechaFin(paciente.getFechaAlta());
 
-            // Publica el evento RabbitMQ
-            CamillaLiberadaEvent evento = new CamillaLiberadaEvent(
-                    camilla.getId(),
-                    paciente.getId(),
-                    paciente.getFechaAlta(),
-                    "system_auto"
-            );
+                    try {
+                        camillaRepository.save(camilla);
+                        log.info("🛏️ Camilla {} liberada exitosamente.", camilla.getId());
+                    } catch (Exception e) {
+                        log.error("❌ Error al guardar estado de la camilla {}: {}", camilla.getId(), e.getMessage(), e);
+                        throw new MongoConnectionException("Error al liberar camilla " + camilla.getId(), e);
+                    }
 
-            try {
-                eventPublisher.publish("hospital.camilla.disponible", evento);
-                log.info("📤 Evento publicado correctamente para camilla {}", camilla.getId());
-            } catch (Exception e) {
-                log.error("⚠️ Error al publicar evento RabbitMQ para camilla {}: {}", camilla.getId(), e.getMessage(), e);
-                throw new BusinessException(
-                        "INTERNAL_ERROR",
-                        "Fallo al publicar evento de liberación de camilla",
-                        "500"
-                );
-            }
-        }, () -> log.warn("⚠️ No se encontró camilla asociada al paciente {}", paciente.getId()));
+                    CamillaLiberadaEvent evento = new CamillaLiberadaEvent(
+                            camilla.getId(),
+                            paciente.getId(),
+                            paciente.getFechaAlta(),
+                            "system_auto"
+                    );
+
+                    try {
+                        eventPublisher.publish("hospital.camilla.disponible", evento);
+                        log.info("📤 Evento publicado correctamente para camilla {}", camilla.getId());
+                    } catch (Exception e) {
+                        log.error("⚠️ Error al publicar evento RabbitMQ para camilla {}: {}", camilla.getId(), e.getMessage(), e);
+                        throw new BusinessException(
+                                "INTERNAL_ERROR",
+                                "Fallo al publicar evento de liberación de camilla",
+                                "500"
+                        );
+                    }
+
+                    return camilla;
+                })
+                .orElse(null);
     }
 }

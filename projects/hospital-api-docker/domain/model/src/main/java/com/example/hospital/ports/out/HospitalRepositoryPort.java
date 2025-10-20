@@ -1,21 +1,23 @@
 package com.example.hospital.ports.out;
 
-
-import com.example.hospital.document.HospitalDocument;
-
+import com.example.hospital.model.Hospital;
 
 import java.util.List;
 import java.util.Optional;
 
-/**
- * 🏥 Puerto de dominio que define las operaciones de persistencia de hospitales.
- */
 public interface HospitalRepositoryPort {
-    List<HospitalDocument> findAll();
-    List<HospitalDocument> findByCity(String city);
-    Optional<HospitalDocument> findById(String id);
-    HospitalDocument save(HospitalDocument hospital);
+
+    List<Hospital> findAll();
+
+    List<Hospital> findByCity(String city);
+
+    Optional<Hospital> findById(String id);
+
+    Hospital save(Hospital hospital);
+
     void deleteById(String id);
+
     boolean existsById(String id);
 }
+
 

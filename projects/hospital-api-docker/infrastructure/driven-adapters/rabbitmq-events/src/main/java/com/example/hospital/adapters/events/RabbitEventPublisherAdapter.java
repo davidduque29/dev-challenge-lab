@@ -1,4 +1,4 @@
-package com.example.hospital.adapters;
+package com.example.hospital.adapters.events;
 
 import com.example.hospital.model.CamillaLiberadaEvent;
 import com.example.hospital.ports.input.EventPublisherPort;

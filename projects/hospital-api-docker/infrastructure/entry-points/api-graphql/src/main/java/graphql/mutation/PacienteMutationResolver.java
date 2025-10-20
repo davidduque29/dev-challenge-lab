@@ -1,141 +1,129 @@
 package graphql.mutation;
 
-import com.example.hospital.document.PacienteDocument;
-import com.example.hospital.usecase.paciente.PacienteUseCase;
-import org.slf4j.Logger;
+ import com.example.hospital.model.Paciente;
+ import com.example.hospital.usecase.paciente.PacienteUseCase;
+ import lombok.RequiredArgsConstructor;
+ import lombok.extern.slf4j.Slf4j;
+ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
- * 🎯 Resolver GraphQL para manejar las Mutations relacionadas con pacientes:
- * - Crear nuevo paciente
- * - Actualizar paciente existente
- * - Eliminar paciente
+ * 🎯 Resolver GraphQL para Mutations relacionadas con Pacientes.
+ * Gestiona la creación, actualización y eliminación de pacientes.
  */
+@Slf4j
 @Controller
+@RequiredArgsConstructor
 public class PacienteMutationResolver {
 
-    private static final Logger log = LoggerFactory.getLogger(PacienteMutationResolver.class);
-    private final PacienteUseCase pacienteService;
+    private final PacienteUseCase pacienteUseCase;
 
-    public PacienteMutationResolver(PacienteUseCase pacienteService) {
-        this.pacienteService = pacienteService;
-    }
+    // =============================
+    // 🏥 CREAR PACIENTE
+    // =============================
 
     /**
-     * 🧍‍♂️ Crear un nuevo paciente en la base de datos (MongoDB).
+     * Crea un nuevo paciente en el sistema hospitalario.
+     * Ejemplo (GraphQL):
+     * mutation {
+     *   crearPaciente(
+     *     primerNombre: "Juan",
+     *     primerApellido: "Pérez",
+     *     documentoIdentidad: "12345",
+     *     genero: "M",
+     *     tipoSangre: "O+"
+     *   ) {
+     *     id
+     *     primerNombre
+     *     primerApellido
+     *     genero
+     *     tipoSangre
+     *   }
+     * }
      */
     @MutationMapping
-    public PacienteDocument crearPaciente(
+    public Paciente crearPaciente(
             @Argument String primerNombre,
             @Argument String segundoNombre,
             @Argument String primerApellido,
             @Argument String segundoApellido,
             @Argument String documentoIdentidad,
-            @Argument String fechaNacimiento, // formato esperado: yyyy-MM-dd
-            @Argument String tipoSangre,
             @Argument String genero,
+            @Argument String tipoSangre,
             @Argument String alergias,
-            @Argument String estado,
-            @Argument String numeroHistoriaClinica,
             @Argument String eps
     ) {
-        log.info("🧬 [GraphQL] Iniciando creación de paciente: {} {}", primerNombre, primerApellido);
-        System.out.println("cmd🧬 [GraphQL] Iniciando creación de paciente: {} {}");
-        PacienteDocument paciente = construirPaciente(
-                primerNombre, segundoNombre, primerApellido, segundoApellido,
-                documentoIdentidad, fechaNacimiento, tipoSangre, genero,
-                alergias, estado, numeroHistoriaClinica, eps
-        );
+        log.info("🧬 [GraphQL] Mutation → crearPaciente()");
+        Paciente nuevo = new Paciente();
+        nuevo.setPrimerNombre(primerNombre);
+        nuevo.setSegundoNombre(segundoNombre);
+        nuevo.setPrimerApellido(primerApellido);
+        nuevo.setSegundoApellido(segundoApellido);
+        nuevo.setDocumentoIdentidad(documentoIdentidad);
+        nuevo.setGenero(genero);
+        nuevo.setTipoSangre(tipoSangre);
+        nuevo.setAlergias(alergias);
+        nuevo.setEps(eps);
+        nuevo.setEstado("Hospitalizado");
 
-        PacienteDocument guardado = pacienteService.crearPaciente(paciente);
-        log.info("✅ Paciente creado correctamente con ID: {}", guardado.getId());
-        return guardado;
+        Paciente creado = pacienteUseCase.crearPaciente(nuevo);
+        log.info("✅ Paciente creado correctamente: {} {}", primerNombre, primerApellido);
+        return creado;
     }
 
-    /**
-     * 🧱 Construye un objeto PacienteDocument a partir de los argumentos GraphQL.
-     */
-    private PacienteDocument construirPaciente(
-            String primerNombre, String segundoNombre, String primerApellido, String segundoApellido,
-            String documentoIdentidad, String fechaNacimiento, String tipoSangre, String genero,
-            String alergias, String estado, String numeroHistoriaClinica, String eps
-    ) {
-        PacienteDocument paciente = new PacienteDocument();
-        paciente.setPrimerNombre(primerNombre);
-        paciente.setSegundoNombre(segundoNombre);
-        paciente.setPrimerApellido(primerApellido);
-        paciente.setSegundoApellido(segundoApellido);
-        paciente.setDocumentoIdentidad(documentoIdentidad);
-        paciente.setFechaNacimiento(parseFecha(fechaNacimiento));
-        paciente.setTipoSangre(tipoSangre);
-        paciente.setGenero(genero);
-        paciente.setAlergias(alergias);
-        paciente.setEstado(estado);
-        paciente.setNumeroHistoriaClinica(numeroHistoriaClinica);
-        paciente.setEps(eps);
-        return paciente;
-    }
+    // =============================
+    // 🧩 ACTUALIZAR PACIENTE
+    // =============================
 
     /**
-     * 🗓️ Convierte una cadena a un objeto Date (formato yyyy-MM-dd).
-     */
-    private Date parseFecha(String fechaNacimiento) {
-        if (fechaNacimiento == null || fechaNacimiento.isBlank()) {
-            log.warn("⚠️ Fecha de nacimiento vacía o nula, se omitirá el valor.");
-            return null;
-        }
-
-        try {
-            return new SimpleDateFormat("yyyy-MM-dd").parse(fechaNacimiento);
-        } catch (ParseException e) {
-            log.error("❌ Error al convertir la fecha '{}': {}", fechaNacimiento, e.getMessage());
-            throw new IllegalArgumentException("Formato de fecha inválido. Usa yyyy-MM-dd");
-        }
-    }
-
-
-    /**
-     * ♻️ Actualizar un paciente existente.
+     * Actualiza la información de un paciente existente.
+     * Ejemplo (GraphQL):
+     * mutation {
+     *   actualizarPaciente(
+     *     id: "68e847552d4447a1dc59fb76",
+     *     alergias: "Ninguna",
+     *     eps: "Nueva EPS"
+     *   ) {
+     *     id
+     *     primerNombre
+     *     alergias
+     *     eps
+     *   }
+     * }
      */
     @MutationMapping
-    public PacienteDocument actualizarPaciente(
+    public Paciente actualizarPaciente(
             @Argument String id,
-            @Argument String primerNombre,
-            @Argument String segundoNombre,
-            @Argument String primerApellido,
-            @Argument String segundoApellido,
-            @Argument String documentoIdentidad,
-            @Argument String fechaNacimiento,
-            @Argument String tipoSangre,
-            @Argument String genero,
             @Argument String alergias,
-            @Argument String estado,
-            @Argument String fechaAlta,
-            @Argument String numeroHistoriaClinica,
-            @Argument String eps
+            @Argument String eps,
+            @Argument String estado
     ) {
-        log.info("♻️ [GraphQL] Mutation → actualizarPaciente() para ID: {}", id);
-        return pacienteService.actualizarPaciente(
-                id, primerNombre, segundoNombre, primerApellido, segundoApellido,
-                documentoIdentidad, fechaNacimiento, tipoSangre, genero,
-                alergias, estado, fechaAlta, numeroHistoriaClinica, eps
-        );
+        log.info("🧩 [GraphQL] Mutation → actualizarPaciente(id={})", id);
+        Paciente actualizado = pacienteUseCase.actualizarPaciente(id, alergias, eps, estado);
+        log.info("✅ Paciente actualizado correctamente: {}", id);
+        return actualizado;
     }
 
+    // =============================
+    // 🗑️ ELIMINAR PACIENTE
+    // =============================
+
     /**
-     * 🗑️ Eliminar un paciente por su ID.
+     * Elimina un paciente del sistema.
+     * Ejemplo (GraphQL):
+     * mutation {
+     *   eliminarPaciente(id: "68e847552d4447a1dc59fb76")
+     * }
      */
     @MutationMapping
     public String eliminarPaciente(@Argument String id) {
-        log.info("🗑️ [GraphQL] Mutation → eliminarPaciente() ID: {}", id);
-        pacienteService.eliminarPaciente(id);
+        log.info("🗑️ [GraphQL] Mutation → eliminarPaciente(id={})", id);
+        pacienteUseCase.eliminarPaciente(id);
+        log.info("✅ Paciente eliminado correctamente: {}", id);
         return "✅ Paciente eliminado exitosamente con ID: " + id;
     }
 }

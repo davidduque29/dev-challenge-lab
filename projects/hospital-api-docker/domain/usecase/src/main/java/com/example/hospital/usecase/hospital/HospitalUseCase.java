@@ -1,6 +1,6 @@
 package com.example.hospital.usecase.hospital;
 
-import com.example.hospital.document.HospitalDocument;
+import com.example.hospital.model.Hospital;
 import com.example.hospital.ports.out.HospitalRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +10,7 @@ import java.util.Optional;
 
 /**
  * 🧠 Caso de uso principal para la gestión de hospitales.
+ * Mantiene la lógica de negocio desacoplada de la infraestructura.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class HospitalUseCase {
     /**
      * Retorna todos los hospitales.
      */
-    public List<HospitalDocument> obtenerTodosLosHospitales() {
+    public List<Hospital> obtenerTodosLosHospitales() {
         log.info("🏥 Obteniendo todos los hospitales...");
         return hospitalRepository.findAll();
     }
@@ -28,7 +29,7 @@ public class HospitalUseCase {
     /**
      * Retorna hospitales por ciudad.
      */
-    public List<HospitalDocument> obtenerHospitalesPorCiudad(String city) {
+    public List<Hospital> obtenerHospitalesPorCiudad(String city) {
         log.info("🌆 Buscando hospitales en la ciudad: {}", city);
         return hospitalRepository.findByCity(city);
     }
@@ -36,7 +37,7 @@ public class HospitalUseCase {
     /**
      * Busca un hospital por su ID.
      */
-    public Optional<HospitalDocument> obtenerHospitalPorId(String id) {
+    public Optional<Hospital> obtenerHospitalPorId(String id) {
         log.info("🔍 Buscando hospital por ID: {}", id);
         return hospitalRepository.findById(id);
     }
@@ -44,7 +45,7 @@ public class HospitalUseCase {
     /**
      * Crea o actualiza un hospital.
      */
-    public HospitalDocument crearHospital(HospitalDocument hospital) {
+    public Hospital crearHospital(Hospital hospital) {
         log.info("🛠️ Guardando hospital: {}", hospital.getName());
         return hospitalRepository.save(hospital);
     }

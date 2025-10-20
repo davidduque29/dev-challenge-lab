@@ -1,7 +1,7 @@
 package com.example.hospital.adapters.repository;
 
 
-import com.example.hospital.document.HospitalDocument;
+import com.example.hospital.adapters.document.HospitalDocument;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

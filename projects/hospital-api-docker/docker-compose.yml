@@ -17,7 +17,7 @@ services:
     image: hospital-api
     container_name: hospital-api
     build:
-      context: ./applications/app-service
+      context: .
       dockerfile: Dockerfile
     ports:
       - "8080:8080"

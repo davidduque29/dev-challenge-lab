@@ -1,18 +1,17 @@
-# Etapa 1: construir to do el proyecto con el POM raíz
+# Etapa 1: compilar
 FROM maven:3.9.6-eclipse-temurin-22 AS builder
 WORKDIR /app
 COPY . .
-RUN mvn -f pom.xml clean package -DskipTests
+RUN mvn -f pom.xml clean package -DskipTests \
+    && ls -R /app/applications
 
-# Etapa 2: ejecutar el microservicio principal
+# Etapa 2: ejecutar
 FROM openjdk:22-jdk-slim
 WORKDIR /app
-# Copiar el .jar generado desde la etapa anterior
 COPY --from=builder /app/applications/*/target/*.jar app.jar
-# Copiar configuración (si existe)
-COPY applications/*/src/main/resources/application.properties /app/config/application.properties
-# Comando de inicio
-ENTRYPOINT ["java", "-jar", "app.jar", "--spring.config.location=file:/app/config/application.properties"]
+# Si deseas la configuración, descomenta luego y ajusta la ruta
+# COPY --from=builder /app/applications/*/src/main/resources/application.properties /app/config/application.properties
+ENTRYPOINT ["java", "-jar", "app.jar"]
 
 
 

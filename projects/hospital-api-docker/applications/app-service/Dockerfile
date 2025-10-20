@@ -1,5 +1,5 @@
 # Imagen base con Java 22
-FROM eclipse-temurin:22-jdk-alpine
+FROM openjdk:22-jdk-slim
 WORKDIR /app
 COPY target/*.jar app.jar
 COPY src/main/resources/application.properties /app/config/application.properties
